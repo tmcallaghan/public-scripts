@@ -1,0 +1,3 @@
+#! /bin/bash
+
+bin/mongo --ssl --host $DOCDB_HOST --sslCAFile $DOCDB_PEM --username $DOCDB_USERNAME --password $DOCDB_PASSWORD
