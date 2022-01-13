@@ -126,7 +126,7 @@ while [ $i -le $DDB_INSTANCE_COUNT ] ; do
               --db-instance-identifier ${DDB_DB_INSTANCE_IDENTIFIER} \
               --db-instance-class $DDB_INSTANCE_CLASS \
               --engine $DDB_ENGINE \
-              --availability-zone $DDB_INSTANCE_AZ_PRIMARY \
+              --availability-zone $DDB_INSTANCE_AZ_REPLICAS \
               --db-cluster-identifier $DDB_DB_CLUSTER_IDENTIFIER`
         fi
 	fi
