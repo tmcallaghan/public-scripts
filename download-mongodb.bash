@@ -1,6 +1,6 @@
 #! /bin/bash
 
-wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-6.0.2.tgz
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-6.0.3.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.13.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-4.4.17.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.2.23.tgz
@@ -10,7 +10,7 @@ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.4.24.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.6.12.tgz
 wget https://downloads.mongodb.com/compass/mongosh-1.5.0-linux-x64.tgz
 
-tar xzvf mongodb-linux-x86_64-ubuntu2004-6.0.2.tgz
+tar xzvf mongodb-linux-x86_64-ubuntu2004-6.0.3.tgz
 tar xzvf mongodb-linux-x86_64-ubuntu2004-5.0.13.tgz
 tar xzvf mongodb-linux-x86_64-ubuntu2004-4.4.17.tgz
 tar xzvf mongodb-linux-x86_64-ubuntu1804-4.2.23.tgz
