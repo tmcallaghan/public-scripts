@@ -1,12 +1,13 @@
 #! /bin/bash
 
 # make sure user passed correct number of parameters
-if [ $# -ne 8 ] ; then
-    echo "8 arguments required: <cluster-identifier> <instance-class> <instance-count> <availability-zone-primary> <availability-zone-replicas> <cluster-parameter-group-name> <vpc-security-group> <subnet-group>"
+if [ $# -ne 9 ] ; then
+    echo "8 arguments required: <cluster-identifier> <instance-class> <instance-count> <availability-zone-primary> <availability-zone-replicas> <cluster-parameter-group-name> <vpc-security-group> <subnet-group> <engine-version>"
     exit 1
 fi
 
 DDB_DB_CLUSTER_IDENTIFIER=$1
+DDB_DB_CLUSTER_IDENTIFIER="${DDB_DB_CLUSTER_IDENTIFIER//./-}"
 DDB_INSTANCE_CLASS=$2
 DDB_INSTANCE_COUNT=$3
 DDB_INSTANCE_AZ_PRIMARY=$4
@@ -14,6 +15,7 @@ DDB_INSTANCE_AZ_REPLICAS=$5
 DDB_DB_CLUSTER_PARAMETER_GROUP_NAME=$6
 DDB_VPC_SECURITY_GROUP_ID1=$7
 DDB_DB_SUBNET_GROUP_NAME=$8
+DDB_ENGINE_VERSION=$9
 
 # number of seconds to wait before looking for progress
 sleepSeconds=5
@@ -21,7 +23,7 @@ sleepSeconds=5
 # validate instance class
 validInstanceClasses=(db.r6g.large db.r6g.xlarge db.r6g.2xlarge db.r6g.4xlarge db.r6g.8xlarge db.r6g.12xlarge db.r6g.16xlarge 
                       db.r5.large db.r5.xlarge db.r5.2xlarge db.r5.4xlarge db.r5.8xlarge db.r5.12xlarge db.r5.16xlarge db.r5.24xlarge
-					  db.t3.medium db.t4g.medium)
+                      db.t3.medium db.t4g.medium)
 
 validInstance=0
 
@@ -45,7 +47,6 @@ fi
 
 DDB_BACKUP_RETENTION_PERIOD=1
 DDB_ENGINE="docdb"
-DDB_ENGINE_VERSION="4.0.0"
 DDB_PORT=27017
 DDB_MASTER_USERNAME=${DOCDB_USERNAME:?Environment variable not set or empty}
 DDB_MASTER_USER_PASSWORD=${DOCDB_PASSWORD:?Environment variable not set or empty}
