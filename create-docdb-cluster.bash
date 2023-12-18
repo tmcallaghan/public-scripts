@@ -2,7 +2,7 @@
 
 # make sure user passed correct number of parameters
 if [ $# -ne 9 ] ; then
-    echo "8 arguments required: <cluster-identifier> <instance-class> <instance-count> <availability-zone-primary> <availability-zone-replicas> <cluster-parameter-group-name> <vpc-security-group> <subnet-group> <engine-version>"
+    echo "9 arguments required: <cluster-identifier> <instance-class> <instance-count> <availability-zone-primary> <availability-zone-replicas> <cluster-parameter-group-name> <vpc-security-group> <subnet-group> <engine-version>"
     exit 1
 fi
 
