@@ -91,3 +91,4 @@ while true ; do
     sleep $sleepSeconds
 done
 
+sleep $sleepSeconds
