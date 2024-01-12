@@ -39,8 +39,4 @@ clusterDeleteInfo=`aws docdb delete-db-cluster \
     --skip-final-snapshot
     `
 
-#dbClusterArn=`echo $clusterDeleteInfo | jq -r '.DBCluster.DBClusterArn'`
-
-#echo "    ... arn = $dbClusterArn"
-
 sleep 15
