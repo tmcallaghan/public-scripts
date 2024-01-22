@@ -1,8 +1,8 @@
 #! /bin/bash
 
 # make sure user passed correct number of parameters
-if [ $# -ne 9 ] ; then
-    echo "9 arguments required: <cluster-identifier> <instance-class> <instance-count> <availability-zone-primary> <availability-zone-replicas> <cluster-parameter-group-name> <vpc-security-group> <subnet-group> <engine-version>"
+if [ $# -ne 10 ] ; then
+    echo "10 arguments required: <cluster-identifier> <instance-class> <instance-count> <availability-zone-primary> <availability-zone-replicas> <cluster-parameter-group-name> <vpc-security-group> <subnet-group> <engine-version> <storage-type>"
     exit 1
 fi
 
@@ -16,6 +16,7 @@ DDB_DB_CLUSTER_PARAMETER_GROUP_NAME=$6
 DDB_VPC_SECURITY_GROUP_ID1=$7
 DDB_DB_SUBNET_GROUP_NAME=$8
 DDB_ENGINE_VERSION=$9
+DDB_STORAGE_TYPE=${10}
 
 # number of seconds to wait before looking for progress
 sleepSeconds=5
@@ -57,17 +58,18 @@ echo "... creating cluster $DDB_DB_CLUSTER_IDENTIFIER"
 
 clusterCreateInfo=`aws docdb create-db-cluster \
   --backup-retention-period $DDB_BACKUP_RETENTION_PERIOD \
-  --db-cluster-identifier $DDB_DB_CLUSTER_IDENTIFIER \
-  --db-cluster-parameter-group-name $DDB_DB_CLUSTER_PARAMETER_GROUP_NAME \
+  --db-cluster-identifier "$DDB_DB_CLUSTER_IDENTIFIER" \
+  --db-cluster-parameter-group-name "$DDB_DB_CLUSTER_PARAMETER_GROUP_NAME" \
   --vpc-security-group-ids "$DDB_VPC_SECURITY_GROUP_ID1" \
-  --db-subnet-group-name $DDB_DB_SUBNET_GROUP_NAME \
+  --db-subnet-group-name "$DDB_DB_SUBNET_GROUP_NAME" \
   --engine $DDB_ENGINE \
   --engine-version $DDB_ENGINE_VERSION \
   --port $DDB_PORT \
-  --master-username $DDB_MASTER_USERNAME \
-  --master-user-password $DDB_MASTER_USER_PASSWORD \
+  --master-username "$DDB_MASTER_USERNAME" \
+  --master-user-password "$DDB_MASTER_USER_PASSWORD" \
   --storage-encrypted \
-  --no-deletion-protection`
+  --no-deletion-protection \
+  --storage-type "$DDB_STORAGE_TYPE"`
 
 dbClusterArn=`echo $clusterCreateInfo | jq -r '.DBCluster.DBClusterArn'`
 
