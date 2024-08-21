@@ -2,7 +2,7 @@
 
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-7.0.0.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-6.0.3.tgz
-wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.13.tgz
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.28.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-4.4.17.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.2.23.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.0.28.tgz
@@ -18,7 +18,7 @@ wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_6
 
 tar xzvf mongodb-linux-x86_64-ubuntu2004-7.0.0.tgz
 tar xzvf mongodb-linux-x86_64-ubuntu2004-6.0.3.tgz
-tar xzvf mongodb-linux-x86_64-ubuntu2004-5.0.13.tgz
+tar xzvf mongodb-linux-x86_64-ubuntu2004-5.0.28.tgz
 tar xzvf mongodb-linux-x86_64-ubuntu2004-4.4.17.tgz
 tar xzvf mongodb-linux-x86_64-ubuntu1804-4.2.23.tgz
 tar xzvf mongodb-linux-x86_64-ubuntu1804-4.0.28.tgz
