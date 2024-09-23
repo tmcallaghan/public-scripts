@@ -31,3 +31,5 @@ tar xzvf mongosh-2.2.6-linux-x64.tgz
 tar xzvf mongodb-database-tools-ubuntu2004-x86_64-100.5.2.tgz
 tar xzvf mongodb-database-tools-ubuntu2004-x86_64-100.7.4.tgz
 tar xzvf mongodb-database-tools-ubuntu2004-x86_64-100.9.4.tgz
+
+rm -f *.tgz
