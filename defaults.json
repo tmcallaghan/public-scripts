@@ -1,0 +1,17 @@
+{
+    "region":           "us-east-1",
+    "instanceType":     "db.r6g.2xlarge",
+    "primaryAz":        "us-east-1a",
+    "readReplicaAz":    "us-east-1b",
+    "parameterGroup":   "<insert-parameter-group>",
+    "vpcSecurityGroup": "<insert-security-group>",
+    "subnetGroup":      "<insert-subnet-group>",
+    "engineVersion":    "5.0.0",
+    "storageType":      "standard",
+    "numReadReplicas":  2,
+    "endpointUrl":      "NONE",
+    "serverPort":       27017,
+    "userName":         "<insert-username>",
+    "userPassword":     "<insert-password>"
+    "sleepSeconds":     15
+}
