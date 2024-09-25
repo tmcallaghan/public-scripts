@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
  
 import boto3
+from botocore.config import Config
 import datetime as dt
 import argparse
 import requests
@@ -11,7 +12,8 @@ import time
 
 
 def logIt(logMessage):
-    logTimeStamp = dt.datetime.now(dt.UTC).isoformat()[:-3] + 'Z'
+    #logTimeStamp = dt.datetime.now(dt.UTC).isoformat()[:-3] + 'Z'
+    logTimeStamp = dt.datetime.utcnow().isoformat()[:-3] + 'Z'
     print("[{}] {}".format(logTimeStamp,logMessage))
 
 
@@ -115,16 +117,9 @@ def create_instance(appConfig, botoClient, instanceRole, readReplicaInstanceNum)
         logIt("  response {}".format(json.dumps(response,sort_keys=True,indent=4,default=str)))
     
         
-def create_cluster(appConfig):
+def create_cluster(appConfig, botoClient):
     logIt("creating cluster {}".format(appConfig['clusterIdentifier']))
     originalStartTime = time.time()
-    
-    if appConfig['endpointUrl'] == 'NONE':
-        botoClient = boto3.client('docdb',region_name=appConfig['region'])
-    else:
-        if appConfig['verbose']:
-            logIt("  using custom endpoint {}".format(appConfig['endpointUrl']))
-        botoClient = boto3.client('docdb',region_name=appConfig['region'],endpoint_url=appConfig['endpointUrl'])
 
     opStartTime = time.time()
     response = botoClient.create_db_cluster(
@@ -178,17 +173,10 @@ def create_cluster(appConfig):
     logIt("cluster creation complete in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))))
 
 
-def delete_cluster(appConfig):
+def delete_cluster(appConfig, botoClient):
     logIt("deleting cluster {}".format(appConfig['clusterIdentifier']))
     originalStartTime = time.time()
     
-    if appConfig['endpointUrl'] == 'NONE':
-        botoClient = boto3.client('docdb',region_name=appConfig['region'])
-    else:
-        if appConfig['verbose']:
-            logIt("  using custom endpoint {}".format(appConfig['endpointUrl']))
-        botoClient = boto3.client('docdb',region_name=appConfig['region'],endpoint_url=appConfig['endpointUrl'])
-
     # delete all instances
     primaryInstance = ""
     readReplicaInstances = []
@@ -251,7 +239,27 @@ def delete_cluster(appConfig):
     opElapsedSeconds = int(time.time() - originalStartTime)
     logIt("cluster deletion complete in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))))
 
+
+def validate_config(appConfig):
+    # validate configuration
+    validationPassed = True
     
+    # check instance class
+    validInstanceClasses=["db.r6g.large","db.r6g.xlarge","db.r6g.2xlarge","db.r6g.4xlarge","db.r6g.8xlarge","db.r6g.12xlarge","db.r6g.16xlarge",
+                          "db.r6gd.large","db.r6gd.xlarge","db.r6gd.2xlarge","db.r6gd.4xlarge","db.r6gd.8xlarge","db.r6gd.12xlarge","db.r6gd.16xlarge",
+                          "db.r7gd.large","db.r7gd.xlarge","db.r7gd.2xlarge","db.r7gd.4xlarge","db.r7gd.8xlarge","db.r7gd.12xlarge","db.r7gd.16xlarge",
+                          "db.r5.large","db.r5.xlarge","db.r5.2xlarge","db.r5.4xlarge","db.r5.8xlarge","db.r5.12xlarge","db.r5.16xlarge","db.r5.24xlarge",
+                          "db.t3.medium","db.t4g.medium"]
+
+    if appConfig['instanceType'] not in validInstanceClasses:
+        validationPassed = False
+        print("ERROR - invalid instance class {}".format(appConfig['instanceType']))
+        
+    if not validationPassed:
+        print("ERROR - failed one or more validation checks, exiting")
+        sys.exit(1)
+   
+
 def main():
     parser = argparse.ArgumentParser(description='DocumentDB Admin Tool')
 
@@ -263,11 +271,9 @@ def main():
     parser.add_argument('-d','--defaults-file',required=False,default="defaults.json",type=str,help='JSON file containing defaults')
     parser.add_argument('-v','--verbose',required=False,action="store_true",help='Enable verbose output')
     parser.add_argument('--sleep-seconds',required=False,default=15,type=int,help='Seconds to sleep between AWS API calls')
+    parser.add_argument('--it','--instance-type',required=False,type=str,help='DocumentDB instance type')
+    parser.add_argument('--nrr','--num-read-replicas',required=False,type=int,help='Number of read replicas')
     
-    #parser.add_argument('--region',required=True,type=str,help='AWS Region')
-    #parser.add_argument('--endpoint-url',required=False,type=str,default='NONE',help='Endpoint URL')
-    #parser.add_argument('--filter-string',required=False,type=str,default='NONENONENONE',help='Only display clusters containing given string(s), comma separated')
-
     args = parser.parse_args()
     
     # read defaults file
@@ -283,18 +289,35 @@ def main():
     appConfig['verbose'] = args.verbose
     appConfig['createCluster'] = args.create_cluster
     appConfig['deleteCluster'] = args.delete_cluster
+
+    if (not appConfig['createCluster']) and (not appConfig['deleteCluster']):
+        print("ERROR - must pass one of --create-cluster or --delete-cluster")
+        sys.exit(1)
+
+    # command line overrides
+    if args.it is not None:
+        appConfig['instanceType'] = args.it
+    if args.nrr is not None:
+        appConfig['numReadReplicas'] = int(args.nrr)
+        
+    #print("appConfig - {}".format(json.dumps(appConfig,sort_keys=True,indent=4,default=str)))
+
+    # validate the configuration
+    validate_config(appConfig)
     
-    #appConfig['region'] = args.region
-    #appConfig['endpointUrl'] = args.endpoint_url
-    #if args.filter_string == "NONENONENONE":
-    #    appConfig['filterString'] = []
-    #else:
-    #    appConfig['filterString'] = args.filter_string.split(",")
+    botoConfig = Config(retries={'max_attempts': 10,'mode': 'standard'})
+
+    if appConfig['endpointUrl'] == 'NONE':
+        botoClient = boto3.client('docdb',region_name=appConfig['region'],config=botoConfig)
+    else:
+        if appConfig['verbose']:
+            logIt("  using custom endpoint {}".format(appConfig['endpointUrl']))
+        botoClient = boto3.client('docdb',region_name=appConfig['region'],endpoint_url=appConfig['endpointUrl'],config=botoConfig)
 
     if appConfig['createCluster']:
-        create_cluster(appConfig)
+        create_cluster(appConfig, botoClient)
     elif appConfig['deleteCluster']:
-        delete_cluster(appConfig)
+        delete_cluster(appConfig, botoClient)
     else:
         print("no command given, exiting")
         sys.exit(1)
