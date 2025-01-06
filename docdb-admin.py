@@ -247,6 +247,41 @@ def delete_cluster(appConfig, botoClient):
     logIt("cluster deletion complete in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))), appConfig)
 
 
+def add_tag(appConfig, botoClient):
+    logIt("adding tag {}".format(appConfig['clusterIdentifier']), appConfig)
+    originalStartTime = time.time()
+
+    # get cluter information
+    clusterInfo = botoClient.describe_db_clusters(DBClusterIdentifier=appConfig['clusterIdentifier'])
+    clusterArn = clusterInfo['DBClusters'][0]['DBClusterArn']
+    if appConfig['verbose']:
+        logIt("  cluster arn =  {}".format(json.dumps(clusterArn,sort_keys=True,indent=4,default=str)), appConfig)
+
+    # add tag to cluster
+    logIt("  adding tag to cluster {}".format(appConfig['clusterIdentifier']), appConfig)
+    response = botoClient.add_tags_to_resource(ResourceName=clusterArn,Tags=[{'Key':appConfig['tagKey'],'Value':appConfig['tagValue']}])
+
+    # add tag to instances
+    instanceCount = 0
+    for thisInstance in clusterInfo['DBClusters'][0]['DBClusterMembers']:
+        responseInstance = botoClient.describe_db_instances(DBInstanceIdentifier=thisInstance['DBInstanceIdentifier'])
+        instanceArn = responseInstance['DBInstances'][0]['DBInstanceArn']
+
+        logIt("  adding tag to instance {}".format(thisInstance['DBInstanceIdentifier']), appConfig)
+        response = botoClient.add_tags_to_resource(ResourceName=instanceArn,Tags=[{'Key':appConfig['tagKey'],'Value':appConfig['tagValue']}])
+
+        if appConfig['verbose']:
+            logIt("  instance arn {}".format(json.dumps(instanceArn,sort_keys=True,indent=4,default=str)), appConfig)
+
+        instanceCount += 1
+
+    if instanceCount == 0:
+        logIt("  no instances found", appConfig)
+
+    opElapsedSeconds = int(time.time() - originalStartTime)
+    logIt("  tags created in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))), appConfig)
+
+
 def validate_config(appConfig):
     # validate configuration
     validationPassed = True
@@ -273,6 +308,7 @@ def main():
     commandGroup = parser.add_mutually_exclusive_group()
     commandGroup.add_argument('--create-cluster',required=False,action="store_true",help='Create a new DocumentDB cluster')
     commandGroup.add_argument('--delete-cluster',required=False,action="store_true",help='Delete an existing DocumentDB cluster')
+    commandGroup.add_argument('--add-tag',required=False,action="store_true",help='Add a tage to an existing DocumentDB cluster and all instances')
     
     parser.add_argument('-i','--cluster-identifier',required=True,type=str,help='DocumentDB cluster identifier')
     parser.add_argument('-d','--defaults-file',required=False,default="defaults.json",type=str,help='JSON file containing defaults')
@@ -282,7 +318,9 @@ def main():
     parser.add_argument('--nrr','--num-read-replicas',required=False,type=int,help='Number of read replicas')
     parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0'],help='DocumentDB version')
     parser.add_argument('--pg','--parameter-group',required=False,type=str,help='Parameter group')
-    
+    parser.add_argument('--tag-key',required=False,type=str,help='Key name for tag')
+    parser.add_argument('--tag-value',required=False,type=str,help='Value for tag')
+
     args = parser.parse_args()
     
     # read defaults file
@@ -298,9 +336,12 @@ def main():
     appConfig['verbose'] = args.verbose
     appConfig['createCluster'] = args.create_cluster
     appConfig['deleteCluster'] = args.delete_cluster
+    appConfig['addTag'] = args.add_tag
+    appConfig['tagKey'] = args.tag_key
+    appConfig['tagValue'] = args.tag_value
     appConfig['startTime'] = time.time()
 
-    if (not appConfig['createCluster']) and (not appConfig['deleteCluster']):
+    if (not appConfig['createCluster']) and (not appConfig['deleteCluster']) and (not appConfig['addTag']):
         print("ERROR - must pass one of --create-cluster or --delete-cluster")
         sys.exit(1)
 
@@ -332,6 +373,8 @@ def main():
         create_cluster(appConfig, botoClient)
     elif appConfig['deleteCluster']:
         delete_cluster(appConfig, botoClient)
+    elif appConfig['addTag']:
+        add_tag(appConfig, botoClient)
     else:
         print("no command given, exiting")
         sys.exit(1)
