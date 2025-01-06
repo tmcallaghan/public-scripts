@@ -280,6 +280,8 @@ def main():
     parser.add_argument('--sleep-seconds',required=False,default=15,type=int,help='Seconds to sleep between AWS API calls')
     parser.add_argument('--it','--instance-type',required=False,type=str,help='DocumentDB instance type')
     parser.add_argument('--nrr','--num-read-replicas',required=False,type=int,help='Number of read replicas')
+    parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0'],help='DocumentDB version')
+    parser.add_argument('--pg','--parameter-group',required=False,type=str,help='Parameter group')
     
     args = parser.parse_args()
     
@@ -307,6 +309,10 @@ def main():
         appConfig['instanceType'] = args.it
     if args.nrr is not None:
         appConfig['numReadReplicas'] = int(args.nrr)
+    if args.ev is not None:
+        appConfig['engineVersion'] = args.ev
+    if args.pg is not None:
+        appConfig['parameterGroup'] = args.pg
         
     #print("appConfig - {}".format(json.dumps(appConfig,sort_keys=True,indent=4,default=str)))
 
