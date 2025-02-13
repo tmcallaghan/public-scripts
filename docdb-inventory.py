@@ -24,40 +24,7 @@ def report_clusters(appConfig):
     
     clusterArr = {}
     for thisCluster in response['DBClusters']:
-        thisClusterDict = {}
-        thisClusterDict['ioType'] = thisCluster.get('StorageType','standard')
-        thisClusterDict['engineVersionFull'] = thisCluster['EngineVersion']
-        thisClusterDict['engineVersionMajor'] = int(thisClusterDict['engineVersionFull'].split('.')[0])
-        thisClusterDict['status'] = thisCluster['Status']
-        thisClusterDict['fullPayload'] = thisCluster
-
-        maxClusterStatusLength = max(len(thisCluster['Status']),maxClusterStatusLength)
-        maxClusterNameLength = max(len(thisCluster['DBClusterIdentifier']),maxClusterNameLength)
-
-        thisClusterInstancesDict = {}
-        numInstances = 0
-        for thisInstance in thisCluster['DBClusterMembers']:
-            # get instance type
-            responseInstance = client.describe_db_instances(DBInstanceIdentifier=thisInstance['DBInstanceIdentifier'])
-            #print("{}".format(responseInstance))
-            thisClusterInstanceDict = {}            
-            #thisClusterInstanceDict['DBInstanceIdentifier'] = responseInstance['DBInstances'][0]['DBInstanceIdentifier']
-            thisClusterInstanceDict['DBInstanceClass'] = responseInstance['DBInstances'][0]['DBInstanceClass']
-            thisClusterInstanceDict['fullPayload'] = responseInstance
-            thisClusterInstancesDict[responseInstance['DBInstances'][0]['DBInstanceIdentifier']] = thisClusterInstanceDict.copy()
-            numInstances += 1
-
-        thisClusterDict['numInstances'] = numInstances
-        #print("cluster = {} | IO type = {} | version = {} | instances = {:d}".format(thisCluster['DBClusterIdentifier'],thisClusterDict['ioType'],thisClusterDict['engineVersionFull'],numInstances))
-        
-        clusterArr[thisCluster['DBClusterIdentifier']] = {'clusterDetails':thisClusterDict.copy(), 'instanceDetails':thisClusterInstancesDict.copy()}
-            
-    client.close()
-    
-    clustersFound = False
-
-    for thisDBClusterIdentifier in sorted(clusterArr.keys()):
-        thisCluster = clusterArr[thisDBClusterIdentifier]
+        thisDBClusterIdentifier = thisCluster['DBClusterIdentifier']
         includeThisCluster = False
         if appConfig['filterString'] == []:
             includeThisCluster = True
@@ -65,32 +32,56 @@ def report_clusters(appConfig):
             for thisSearchString in appConfig['filterString']:
                 if thisSearchString.casefold() in thisDBClusterIdentifier:
                     includeThisCluster = True
-            
-        #if (appConfig['filterString'] == 'NONENONENONE') or (appConfig['filterString'].casefold() in thisDBClusterIdentifier):
-        if includeThisCluster:
-            clustersFound = True
-            if appConfig['compact']:
-                print("{0:<{w1}} | IO type = {1} | version = {2} | instances = {3:d} | status = {4:<{w2}} | endpoint = {5}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
-                      thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
-                      thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),w1=maxClusterNameLength,w2=maxClusterStatusLength))
-            else:
-                print("")
-                print("cluster = {} | IO type = {} | version = {} | instances = {:d} | status = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
-                      thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
-                      thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['fullPayload']['DBClusterArn']))
-            #print("{}".format(thisCluster['instanceDetails']))
-            #print("{}".format(thisCluster['clusterDetails']['fullPayload']['Endpoint']))
-            #print("{}".format(thisCluster['clusterDetails']['fullPayload']))
-            if appConfig['verbose']:
-                print("{}".format(json.dumps(thisCluster,sort_keys=True,indent=4,default=str)))
 
-            if not appConfig['compact']:
-                for DBInstanceIdentifier in sorted(thisCluster['instanceDetails'].keys()):
-                    #print("{}".format(DBInstanceIdentifier))
-                    thisInstance = thisCluster['instanceDetails'][DBInstanceIdentifier]
-                    print("  instance = {} | instance type = {} | availability zone = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
-                                                                                      thisInstance['fullPayload']['DBInstances'][0]['DBInstanceStatus'],thisInstance['fullPayload']['DBInstances'][0]['DBInstanceArn']))
-                    #print("{}".format(json.dumps(thisInstance['fullPayload'],sort_keys=True,indent=4,default=str)))
+        if includeThisCluster:
+            thisClusterDict = {}
+            thisClusterDict['ioType'] = thisCluster.get('StorageType','standard')
+            thisClusterDict['engineVersionFull'] = thisCluster['EngineVersion']
+            thisClusterDict['engineVersionMajor'] = int(thisClusterDict['engineVersionFull'].split('.')[0])
+            thisClusterDict['status'] = thisCluster['Status']
+            thisClusterDict['fullPayload'] = thisCluster
+
+            maxClusterStatusLength = max(len(thisCluster['Status']),maxClusterStatusLength)
+            maxClusterNameLength = max(len(thisCluster['DBClusterIdentifier']),maxClusterNameLength)
+
+            thisClusterInstancesDict = {}
+            numInstances = 0
+            for thisInstance in thisCluster['DBClusterMembers']:
+                # get instance type
+                responseInstance = client.describe_db_instances(DBInstanceIdentifier=thisInstance['DBInstanceIdentifier'])
+                thisClusterInstanceDict = {}
+                thisClusterInstanceDict['DBInstanceClass'] = responseInstance['DBInstances'][0]['DBInstanceClass']
+                thisClusterInstanceDict['fullPayload'] = responseInstance
+                thisClusterInstancesDict[responseInstance['DBInstances'][0]['DBInstanceIdentifier']] = thisClusterInstanceDict.copy()
+                numInstances += 1
+
+            thisClusterDict['numInstances'] = numInstances
+
+            clusterArr[thisCluster['DBClusterIdentifier']] = {'clusterDetails':thisClusterDict.copy(), 'instanceDetails':thisClusterInstancesDict.copy()}
+
+    client.close()
+
+    clustersFound = False
+    for thisDBClusterIdentifier in sorted(clusterArr.keys()):
+        thisCluster = clusterArr[thisDBClusterIdentifier]
+        clustersFound = True
+        if appConfig['compact']:
+            print("{0:<{w1}} | IO type = {1} | version = {2} | instances = {3:d} | status = {4:<{w2}} | endpoint = {5}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+                  thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
+                  thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),w1=maxClusterNameLength,w2=maxClusterStatusLength))
+        else:
+            print("")
+            print("cluster = {} | IO type = {} | version = {} | instances = {:d} | status = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+                  thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
+                  thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['fullPayload']['DBClusterArn']))
+
+            for DBInstanceIdentifier in sorted(thisCluster['instanceDetails'].keys()):
+                thisInstance = thisCluster['instanceDetails'][DBInstanceIdentifier]
+                print("  instance = {} | instance type = {} | availability zone = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
+                      thisInstance['fullPayload']['DBInstances'][0]['DBInstanceStatus'],thisInstance['fullPayload']['DBInstances'][0]['DBInstanceArn']))
+
+        if appConfig['verbose']:
+            print("{}".format(json.dumps(thisCluster,sort_keys=True,indent=4,default=str)))
     
     if not clustersFound:
         if (appConfig['filterString'] == 'NONENONENONE'):
