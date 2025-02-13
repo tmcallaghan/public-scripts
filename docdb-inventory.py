@@ -63,22 +63,28 @@ def report_clusters(appConfig):
         #if (appConfig['filterString'] == 'NONENONENONE') or (appConfig['filterString'].casefold() in thisDBClusterIdentifier):
         if includeThisCluster:
             clustersFound = True
-            print("")
-            print("cluster = {} | IO type = {} | version = {} | instances = {:d} | status = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
-                  thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
-                  thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['fullPayload']['DBClusterArn']))
+            if appConfig['compact']:
+                print("{:<20} | IO type = {} | version = {} | instances = {:d} | status = {:<15} | endpoint = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+                      thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
+                      thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>')))
+            else:
+                print("")
+                print("cluster = {} | IO type = {} | version = {} | instances = {:d} | status = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+                      thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
+                      thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['fullPayload']['DBClusterArn']))
             #print("{}".format(thisCluster['instanceDetails']))
             #print("{}".format(thisCluster['clusterDetails']['fullPayload']['Endpoint']))
             #print("{}".format(thisCluster['clusterDetails']['fullPayload']))
             if appConfig['verbose']:
                 print("{}".format(json.dumps(thisCluster,sort_keys=True,indent=4,default=str)))
-                
-            for DBInstanceIdentifier in sorted(thisCluster['instanceDetails'].keys()):
-                #print("{}".format(DBInstanceIdentifier))
-                thisInstance = thisCluster['instanceDetails'][DBInstanceIdentifier]
-                print("  instance = {} | instance type = {} | availability zone = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
-                                                                                  thisInstance['fullPayload']['DBInstances'][0]['DBInstanceStatus'],thisInstance['fullPayload']['DBInstances'][0]['DBInstanceArn']))
-                #print("{}".format(json.dumps(thisInstance['fullPayload'],sort_keys=True,indent=4,default=str)))
+
+            if not appConfig['compact']:
+                for DBInstanceIdentifier in sorted(thisCluster['instanceDetails'].keys()):
+                    #print("{}".format(DBInstanceIdentifier))
+                    thisInstance = thisCluster['instanceDetails'][DBInstanceIdentifier]
+                    print("  instance = {} | instance type = {} | availability zone = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
+                                                                                      thisInstance['fullPayload']['DBInstances'][0]['DBInstanceStatus'],thisInstance['fullPayload']['DBInstances'][0]['DBInstanceArn']))
+                    #print("{}".format(json.dumps(thisInstance['fullPayload'],sort_keys=True,indent=4,default=str)))
     
     if not clustersFound:
         if (appConfig['filterString'] == 'NONENONENONE'):
@@ -86,8 +92,6 @@ def report_clusters(appConfig):
         else:
             print("  no clusters found for filter {}".format(appConfig['filterString']))
         
-        
-    
     
 def main():
     parser = argparse.ArgumentParser(description='DocumentDB Deployment Scanner')
@@ -96,6 +100,7 @@ def main():
     parser.add_argument('--endpoint-url',required=False,type=str,default='NONE',help='Endpoint URL')
     parser.add_argument('--filter-string',required=False,type=str,default='NONENONENONE',help='Only display clusters containing given string(s), comma separated')
     parser.add_argument('--verbose',required=False,action="store_true",help='Enable verbose output')
+    parser.add_argument('--compact',required=False,action="store_true",help='Enable compact output')
 
     args = parser.parse_args()
    
@@ -108,6 +113,7 @@ def main():
         appConfig['filterString'] = args.filter_string.split(",")
     
     appConfig['verbose'] = args.verbose
+    appConfig['compact'] = args.compact
 
     report_clusters(appConfig)
 
