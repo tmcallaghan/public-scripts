@@ -315,7 +315,7 @@ def main():
     parser.add_argument('-i','--cluster-identifier',required=True,type=str,help='DocumentDB cluster identifier')
     parser.add_argument('-d','--defaults-file',required=False,default="defaults.json",type=str,help='JSON file containing defaults')
     parser.add_argument('-v','--verbose',required=False,action="store_true",help='Enable verbose output')
-    parser.add_argument('--sleep-seconds',required=False,default=15,type=int,help='Seconds to sleep between AWS API calls')
+    parser.add_argument('--sleep-seconds',required=False,default=30,type=int,help='Seconds to sleep between AWS API calls')
     parser.add_argument('--it','--instance-type',required=False,type=str,help='DocumentDB instance type')
     parser.add_argument('--nrr','--num-read-replicas',required=False,type=int,help='Number of read replicas')
     parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0'],help='DocumentDB version')
