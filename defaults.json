@@ -13,5 +13,5 @@
     "serverPort":       27017,
     "userName":         "<insert-username>",
     "userPassword":     "<insert-password>",
-    "sleepSeconds":     15
+    "sleepSeconds":     30
 }
