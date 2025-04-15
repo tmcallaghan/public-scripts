@@ -289,7 +289,9 @@ def validate_config(appConfig):
     # check instance class
     validInstanceClasses=["db.r6g.large","db.r6g.xlarge","db.r6g.2xlarge","db.r6g.4xlarge","db.r6g.8xlarge","db.r6g.12xlarge","db.r6g.16xlarge",
                           "db.r6gd.large","db.r6gd.xlarge","db.r6gd.2xlarge","db.r6gd.4xlarge","db.r6gd.8xlarge","db.r6gd.12xlarge","db.r6gd.16xlarge",
+                          "db.r7g.large","db.r7g.xlarge","db.r7g.2xlarge","db.r7g.4xlarge","db.r7g.8xlarge","db.r7g.12xlarge","db.r7g.16xlarge",
                           "db.r7gd.large","db.r7gd.xlarge","db.r7gd.2xlarge","db.r7gd.4xlarge","db.r7gd.8xlarge","db.r7gd.12xlarge","db.r7gd.16xlarge",
+                          "db.r8g.large","db.r8g.xlarge","db.r8g.2xlarge","db.r8g.4xlarge","db.r8g.8xlarge","db.r8g.12xlarge","db.r8g.16xlarge","db.r8g.24xlarge","db.r8g.48xlarge",
                           "db.r5.large","db.r5.xlarge","db.r5.2xlarge","db.r5.4xlarge","db.r5.8xlarge","db.r5.12xlarge","db.r5.16xlarge","db.r5.24xlarge",
                           "db.t3.medium","db.t4g.medium"]
 
