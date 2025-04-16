@@ -19,8 +19,8 @@ def logIt(logMessage, appConfig):
     thisHMS = "{:0>2}:{:0>2}:{:0>2}".format(int(thisHours),int(thisMinutes),thisSeconds)
    
     # timestamp
-    #logTimeStamp = dt.datetime.now(dt.UTC).isoformat()[:-3] + 'Z'
-    logTimeStamp = dt.datetime.utcnow().isoformat()[:-7] + 'Z'
+    logTimeStamp = dt.datetime.now(dt.UTC).isoformat()[:-3] + 'Z'
+    #logTimeStamp = dt.datetime.utcnow().isoformat()[:-7] + 'Z'
     print("[{}] [{}] {}".format(logTimeStamp,thisHMS,logMessage))
 
 
