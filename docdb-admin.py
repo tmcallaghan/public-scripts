@@ -19,8 +19,10 @@ def logIt(logMessage, appConfig):
     thisHMS = "{:0>2}:{:0>2}:{:0>2}".format(int(thisHours),int(thisMinutes),thisSeconds)
    
     # timestamp
-    logTimeStamp = dt.datetime.now(dt.UTC).isoformat()[:-3] + 'Z'
-    #logTimeStamp = dt.datetime.utcnow().isoformat()[:-7] + 'Z'
+    if sys.version_info[0] > 3 or (sys.version_info[0] == 3 and sys.version_info[1] >= 12):
+        logTimeStamp = dt.datetime.now(dt.UTC).isoformat()[:-3] + 'Z'
+    else:
+        logTimeStamp = dt.datetime.utcnow().isoformat()[:-7] + 'Z'
     print("[{}] [{}] {}".format(logTimeStamp,thisHMS,logMessage))
 
 
@@ -30,6 +32,12 @@ def wait_for_cluster_deleted(appConfig, botoClient):
 
     while not clusterDeleted:
         try:
+            # check for timeout
+            totSeconds = int(time.time()-appConfig['startTime'])
+            if totSeconds >= appConfig['timeoutSeconds']:
+                logIt("*** Script execution cancelled, timeout of {} seconds reached ***".format(appConfig['timeoutSeconds']), appConfig)
+                sys.exit(1)
+
             response = botoClient.describe_db_clusters(DBClusterIdentifier=appConfig['clusterIdentifier'])
             if appConfig['verbose']:
                 logIt("  response {}".format(json.dumps(response,sort_keys=True,indent=4,default=str)), appConfig)
@@ -47,6 +55,12 @@ def wait_for_cluster_available(appConfig, botoClient):
     priorStatus = "<<NOT-A-VALID-STATUS>>"
 
     while not clusterAvailable:
+        # check for timeout
+        totSeconds = int(time.time()-appConfig['startTime'])
+        if totSeconds >= appConfig['timeoutSeconds']:
+            logIt("*** Script execution cancelled, timeout of {} seconds reached ***".format(appConfig['timeoutSeconds']), appConfig)
+            sys.exit(1)
+
         response = botoClient.describe_db_clusters(DBClusterIdentifier=appConfig['clusterIdentifier'])
         if appConfig['verbose']:
             logIt("  response {}".format(json.dumps(response,sort_keys=True,indent=4,default=str)), appConfig)
@@ -75,8 +89,14 @@ def wait_for_instances_available(appConfig, botoClient):
         instanceCount += 1
         
     while not allInstancesAvailable:
+        # check for timeout
+        totSeconds = int(time.time()-appConfig['startTime'])
+        if totSeconds >= appConfig['timeoutSeconds']:
+            logIt("*** Script execution cancelled, timeout of {} seconds reached ***".format(appConfig['timeoutSeconds']), appConfig)
+            sys.exit(1)
+
         instancesAvailable = 0
-        
+
         for thisInstance in instanceNameList:
             response = botoClient.describe_db_instances(DBInstanceIdentifier=thisInstance)
             if appConfig['verbose']:
@@ -219,6 +239,12 @@ def delete_cluster(appConfig, botoClient):
         
         # wait for instance count to go to zero
         while instanceCount > 0:
+            # check for timeout
+            totSeconds = int(time.time()-appConfig['startTime'])
+            if totSeconds >= appConfig['timeoutSeconds']:
+                logIt("*** Script execution cancelled, timeout of {} seconds reached ***".format(appConfig['timeoutSeconds']), appConfig)
+                sys.exit(1)
+
             response = botoClient.describe_db_clusters(DBClusterIdentifier=appConfig['clusterIdentifier'])
             instanceCount = len(response['DBClusters'][0]['DBClusterMembers'])
             
@@ -315,13 +341,14 @@ def main():
     parser.add_argument('-i','--cluster-identifier',required=True,type=str,help='DocumentDB cluster identifier')
     parser.add_argument('-d','--defaults-file',required=False,default="defaults.json",type=str,help='JSON file containing defaults')
     parser.add_argument('-v','--verbose',required=False,action="store_true",help='Enable verbose output')
-    parser.add_argument('--sleep-seconds',required=False,default=30,type=int,help='Seconds to sleep between AWS API calls')
+    parser.add_argument('--ss','--sleep-seconds',required=False,default=60,type=int,help='Seconds to sleep between AWS API calls')
     parser.add_argument('--it','--instance-type',required=False,type=str,help='DocumentDB instance type')
     parser.add_argument('--nrr','--num-read-replicas',required=False,type=int,help='Number of read replicas')
     parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0'],help='DocumentDB version')
     parser.add_argument('--pg','--parameter-group',required=False,type=str,help='Parameter group')
     parser.add_argument('--tag-key',required=False,type=str,help='Key name for tag')
     parser.add_argument('--tag-value',required=False,type=str,help='Value for tag')
+    parser.add_argument('--timeout-seconds',required=False,type=int,default=3600,help='Timeout in seconds (give up waiting for request to complete)')
 
     args = parser.parse_args()
     
@@ -342,9 +369,10 @@ def main():
     appConfig['tagKey'] = args.tag_key
     appConfig['tagValue'] = args.tag_value
     appConfig['startTime'] = time.time()
+    appConfig['timeoutSeconds'] = int(args.timeout_seconds)
 
     if (not appConfig['createCluster']) and (not appConfig['deleteCluster']) and (not appConfig['addTag']):
-        print("ERROR - must pass one of --create-cluster or --delete-cluster")
+        print("ERROR - must pass one of --create-cluster, --delete-cluster, or --add-tag")
         sys.exit(1)
 
     # command line overrides
