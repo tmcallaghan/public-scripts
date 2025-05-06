@@ -349,6 +349,7 @@ def main():
     parser.add_argument('--tag-key',required=False,type=str,help='Key name for tag')
     parser.add_argument('--tag-value',required=False,type=str,help='Value for tag')
     parser.add_argument('--timeout-seconds',required=False,type=int,default=3600,help='Timeout in seconds (give up waiting for request to complete)')
+    parser.add_argument('--primary-az',required=False,type=str,help='Availability zone for primary instance')
 
     args = parser.parse_args()
     
@@ -384,6 +385,8 @@ def main():
         appConfig['engineVersion'] = args.ev
     if args.pg is not None:
         appConfig['parameterGroup'] = args.pg
+    if args.primary_az is not None:
+        appConfig['primaryAz'] = args.primary_az
         
     #print("appConfig - {}".format(json.dumps(appConfig,sort_keys=True,indent=4,default=str)))
 
