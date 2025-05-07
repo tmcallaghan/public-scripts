@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Clone and MVU a DocDB cluster
+# Clone and MVU a DocDB cluster - for testing
 
 # make sure user passed correct number of parameters
 if [ $# -ne 4 ] ; then
