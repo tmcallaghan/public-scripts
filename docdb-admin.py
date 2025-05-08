@@ -344,7 +344,7 @@ def main():
     parser.add_argument('--ss','--sleep-seconds',required=False,default=60,type=int,help='Seconds to sleep between AWS API calls')
     parser.add_argument('--it','--instance-type',required=False,type=str,help='DocumentDB instance type')
     parser.add_argument('--nrr','--num-read-replicas',required=False,type=int,help='Number of read replicas')
-    parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0'],help='DocumentDB version')
+    parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0','5.0.dev'],help='DocumentDB version')
     parser.add_argument('--pg','--parameter-group',required=False,type=str,help='Parameter group')
     parser.add_argument('--tag-key',required=False,type=str,help='Key name for tag')
     parser.add_argument('--tag-value',required=False,type=str,help='Value for tag')
