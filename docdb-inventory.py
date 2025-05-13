@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
  
 import boto3
+from botocore.config import Config
 import datetime
 import argparse
 import requests
@@ -12,13 +13,15 @@ import os
 def report_clusters(appConfig):
     print("Gathering cluster details.")
 
+    botoConfig = Config(retries={'max_attempts': 10,'mode': 'standard'})
+
     maxClusterNameLength = 0
     maxClusterStatusLength = 0
 
     if appConfig['endpointUrl'] == 'NONE':
-        client = boto3.client('docdb',region_name=appConfig['region'])
+        client = boto3.client('docdb',region_name=appConfig['region'],config=botoConfig)
     else:
-        client = boto3.client('docdb',region_name=appConfig['region'],endpoint_url=appConfig['endpointUrl'])
+        client = boto3.client('docdb',region_name=appConfig['region'],endpoint_url=appConfig['endpointUrl'],config=botoConfig)
     
     response = client.describe_db_clusters(Filters=[{'Name': 'engine','Values': ['docdb']}])
     
