@@ -71,7 +71,7 @@ def wait_for_cluster_available(appConfig, botoClient):
             if clusterStatus != priorStatus:
                 logIt("  waiting for cluster status to change from {} to available".format(clusterStatus), appConfig)
                 priorStatus = clusterStatus
-            time.sleep(appConfig['sleepSeconds'])
+        time.sleep(appConfig['sleepSeconds'])
 
         
 def wait_for_instances_available(appConfig, botoClient):
@@ -251,6 +251,8 @@ def delete_cluster(appConfig, botoClient):
             if instanceCount != priorInstanceCount:
                 logIt("    cluster contains {} instance(s), waiting for 0".format(instanceCount), appConfig)
                 priorInstanceCount = instanceCount
+
+            time.sleep(appConfig['sleepSeconds'])
 
         opElapsedSeconds = int(time.time() - opStartTime)
         logIt("  instances deleted in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))), appConfig)
