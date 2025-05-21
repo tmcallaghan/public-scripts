@@ -16,6 +16,7 @@ wget https://downloads.mongodb.com/compass/mongosh-1.5.0-linux-x64.tgz
 wget https://downloads.mongodb.com/compass/mongosh-2.2.6-linux-x64.tgz
 wget https://downloads.mongodb.com/compass/mongosh-2.3.3-linux-x64.tgz
 wget https://downloads.mongodb.com/compass/mongosh-2.4.0-linux-x64.tgz
+wget https://downloads.mongodb.com/compass/mongosh-2.5.1-linux-x64.tgz
 wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.5.2.tgz
 wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.7.4.tgz
 wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.9.4.tgz
@@ -36,6 +37,7 @@ tar xzvf mongosh-1.5.0-linux-x64.tgz
 tar xzvf mongosh-2.2.6-linux-x64.tgz
 tar xzvf mongosh-2.3.3-linux-x64.tgz
 tar xzvf mongosh-2.4.0-linux-x64.tgz
+tar xzvf mongosh-2.5.1-linux-x64.tgz
 tar xzvf mongodb-database-tools-ubuntu2004-x86_64-100.5.2.tgz
 tar xzvf mongodb-database-tools-ubuntu2004-x86_64-100.7.4.tgz
 tar xzvf mongodb-database-tools-ubuntu2004-x86_64-100.9.4.tgz
