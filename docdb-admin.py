@@ -393,6 +393,8 @@ def main():
         appConfig['parameterGroup'] = args.pg
     if args.primary_az is not None:
         appConfig['primaryAz'] = args.primary_az
+    if args.st is not None:
+        appConfig['storageType'] = args.st
         
     #print("appConfig - {}".format(json.dumps(appConfig,sort_keys=True,indent=4,default=str)))
 
