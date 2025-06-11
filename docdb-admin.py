@@ -183,18 +183,19 @@ def create_cluster(appConfig, botoClient):
 
     opStartTime = time.time()
 
-    # primary instance
-    create_instance(appConfig, botoClient, "primary", 0)
+    if not appConfig['clusterOnly']:
+        # primary instance
+        create_instance(appConfig, botoClient, "primary", 0)
     
-    # read replica instance(s)
-    if appConfig['numReadReplicas'] > 0:
-        for rrNum in range(1,appConfig['numReadReplicas']+1):
-            create_instance(appConfig, botoClient, "readReplica", rrNum)
+        # read replica instance(s)
+        if appConfig['numReadReplicas'] > 0:
+            for rrNum in range(1,appConfig['numReadReplicas']+1):
+                create_instance(appConfig, botoClient, "readReplica", rrNum)
 
-    # wait for all instances to be available
-    wait_for_instances_available(appConfig, botoClient)
-    opElapsedSeconds = int(time.time() - opStartTime)
-    logIt("  instances created in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))), appConfig)
+        # wait for all instances to be available
+        wait_for_instances_available(appConfig, botoClient)
+        opElapsedSeconds = int(time.time() - opStartTime)
+        logIt("  instances created in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))), appConfig)
     
     opElapsedSeconds = int(time.time() - originalStartTime)
     logIt("cluster creation complete in {}".format(str(dt.timedelta(seconds=opElapsedSeconds))), appConfig)
@@ -352,6 +353,8 @@ def main():
     parser.add_argument('--tag-value',required=False,type=str,help='Value for tag')
     parser.add_argument('--timeout-seconds',required=False,type=int,default=3600,help='Timeout in seconds (give up waiting for request to complete)')
     parser.add_argument('--primary-az',required=False,type=str,help='Availability zone for primary instance')
+    parser.add_argument('--cluster-only',required=False,action="store_true",help='Simply create the cluster, no instances')
+    parser.add_argument('--st','--storage-type',required=False,type=str,choices=['standard','iopt1'],help='Storage type')
 
     args = parser.parse_args()
     
@@ -373,6 +376,7 @@ def main():
     appConfig['tagValue'] = args.tag_value
     appConfig['startTime'] = time.time()
     appConfig['timeoutSeconds'] = int(args.timeout_seconds)
+    appConfig['clusterOnly'] = args.cluster_only
 
     if (not appConfig['createCluster']) and (not appConfig['deleteCluster']) and (not appConfig['addTag']):
         print("ERROR - must pass one of --create-cluster, --delete-cluster, or --add-tag")
