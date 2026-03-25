@@ -9,6 +9,7 @@ import json
 import sys
 import os
 import time
+from decimal import Decimal
 
 
 def logIt(logMessage, appConfig):
@@ -159,7 +160,11 @@ def create_cluster(appConfig, botoClient):
                                         Port=appConfig['serverPort'],
                                         MasterUsername=appConfig['userName'],
                                         MasterUserPassword=appConfig['userPassword'],
-                                        StorageType=appConfig['storageType'])
+                                        StorageType=appConfig['storageType'],
+                                        ServerlessV2ScalingConfiguration={
+                                           'MinCapacity': 0.5,  # Minimum DCUs (0.5 to 256)
+                                           'MaxCapacity': 256   # Maximum DCUs (1 to 256)
+                                        })
                                        
     if appConfig['verbose']:
         logIt("  response {}".format(json.dumps(response,sort_keys=True,indent=4,default=str)), appConfig)
@@ -322,7 +327,8 @@ def validate_config(appConfig):
                           "db.r7gd.large","db.r7gd.xlarge","db.r7gd.2xlarge","db.r7gd.4xlarge","db.r7gd.8xlarge","db.r7gd.12xlarge","db.r7gd.16xlarge",
                           "db.r8g.large","db.r8g.xlarge","db.r8g.2xlarge","db.r8g.4xlarge","db.r8g.8xlarge","db.r8g.12xlarge","db.r8g.16xlarge","db.r8g.24xlarge","db.r8g.48xlarge",
                           "db.r5.large","db.r5.xlarge","db.r5.2xlarge","db.r5.4xlarge","db.r5.8xlarge","db.r5.12xlarge","db.r5.16xlarge","db.r5.24xlarge",
-                          "db.t3.medium","db.t4g.medium"]
+                          "db.t3.medium","db.t4g.medium",
+                          "db.serverless"]
 
     if appConfig['instanceType'] not in validInstanceClasses:
         validationPassed = False
@@ -355,6 +361,8 @@ def main():
     parser.add_argument('--primary-az',required=False,type=str,help='Availability zone for primary instance')
     parser.add_argument('--cluster-only',required=False,action="store_true",help='Simply create the cluster, no instances')
     parser.add_argument('--st','--storage-type',required=False,type=str,choices=['standard','iopt1'],help='Storage type')
+    parser.add_argument('--min-dcu',required=False,type=Decimal,default=0.5,help='ServerlessV2 Minimum DCU')
+    parser.add_argument('--max-dcu',required=False,type=Decimal,default=64,help='ServerlessV2 Maximum DCU')
 
     args = parser.parse_args()
     
@@ -377,6 +385,8 @@ def main():
     appConfig['startTime'] = time.time()
     appConfig['timeoutSeconds'] = int(args.timeout_seconds)
     appConfig['clusterOnly'] = args.cluster_only
+    appConfig['serverlessMinDcu'] = args.min_dcu
+    appConfig['serverlessMaxDcu'] = args.max_dcu
 
     if (not appConfig['createCluster']) and (not appConfig['deleteCluster']) and (not appConfig['addTag']):
         print("ERROR - must pass one of --create-cluster, --delete-cluster, or --add-tag")
