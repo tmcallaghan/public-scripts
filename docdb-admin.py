@@ -150,21 +150,37 @@ def create_cluster(appConfig, botoClient):
     originalStartTime = time.time()
 
     opStartTime = time.time()
-    response = botoClient.create_db_cluster(
-                                        DBClusterIdentifier=appConfig['clusterIdentifier'],
-                                        DBClusterParameterGroupName=appConfig['parameterGroup'],
-                                        VpcSecurityGroupIds=[appConfig['vpcSecurityGroup']],
-                                        DBSubnetGroupName=appConfig['subnetGroup'],
-                                        Engine='docdb',
-                                        EngineVersion=appConfig['engineVersion'],
-                                        Port=appConfig['serverPort'],
-                                        MasterUsername=appConfig['userName'],
-                                        MasterUserPassword=appConfig['userPassword'],
-                                        StorageType=appConfig['storageType'],
-                                        ServerlessV2ScalingConfiguration={
-                                           'MinCapacity': 0.5,  # Minimum DCUs (0.5 to 256)
-                                           'MaxCapacity': 256   # Maximum DCUs (1 to 256)
-                                        })
+    if appConfig['engineVersion'] == '5.0.0':
+        # serverless is 5.0.0 only for now, will improve or remove this hack later
+        response = botoClient.create_db_cluster(
+                                            DBClusterIdentifier=appConfig['clusterIdentifier'],
+                                            DBClusterParameterGroupName=appConfig['parameterGroup'],
+                                            VpcSecurityGroupIds=[appConfig['vpcSecurityGroup']],
+                                            DBSubnetGroupName=appConfig['subnetGroup'],
+                                            Engine='docdb',
+                                            EngineVersion=appConfig['engineVersion'],
+                                            Port=appConfig['serverPort'],
+                                            MasterUsername=appConfig['userName'],
+                                            MasterUserPassword=appConfig['userPassword'],
+                                            StorageType=appConfig['storageType'],
+                                            ServerlessV2ScalingConfiguration={
+                                               'MinCapacity': 0.5,  # Minimum DCUs (0.5 to 256)
+                                               'MaxCapacity': 256   # Maximum DCUs (1 to 256)
+                                            })
+
+    else:
+        response = botoClient.create_db_cluster(
+                                            DBClusterIdentifier=appConfig['clusterIdentifier'],
+                                            DBClusterParameterGroupName=appConfig['parameterGroup'],
+                                            VpcSecurityGroupIds=[appConfig['vpcSecurityGroup']],
+                                            DBSubnetGroupName=appConfig['subnetGroup'],
+                                            Engine='docdb',
+                                            EngineVersion=appConfig['engineVersion'],
+                                            Port=appConfig['serverPort'],
+                                            MasterUsername=appConfig['userName'],
+                                            MasterUserPassword=appConfig['userPassword'],
+                                            StorageType=appConfig['storageType'])
+
                                        
     if appConfig['verbose']:
         logIt("  response {}".format(json.dumps(response,sort_keys=True,indent=4,default=str)), appConfig)
