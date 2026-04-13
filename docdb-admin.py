@@ -24,7 +24,7 @@ def logIt(logMessage, appConfig):
         logTimeStamp = dt.datetime.now(dt.UTC).isoformat()[:-3] + 'Z'
     else:
         logTimeStamp = dt.datetime.utcnow().isoformat()[:-7] + 'Z'
-    print("[{}] [{}] {}".format(logTimeStamp,thisHMS,logMessage))
+    print("[{}] [{}] [{}] {}".format(logTimeStamp,thisHMS,appConfig['clusterIdentifier'],logMessage))
 
 
 def wait_for_cluster_deleted(appConfig, botoClient):
