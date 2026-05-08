@@ -130,14 +130,14 @@ def create_instance(appConfig, botoClient, instanceRole, readReplicaInstanceNum)
                                     DBInstanceClass=appConfig['instanceType'],
                                     Engine='docdb',
                                     AvailabilityZone=azName,
-                                    DBClusterIdentifier=appConfig['clusterIdentifier'])
+                                    DBClusterIdentifier=appConfig['clusterIdentifier'],
+                                    EnablePerformanceInsights=appConfig['performanceInsights'])
 
     #PreferredMaintenanceWindow='string',
     #AutoMinorVersionUpgrade=True|False,
     #Tags=[{'Key': 'string','Value': 'string'},],
     #CopyTagsToSnapshot=True|False,
     #PromotionTier=123,
-    #EnablePerformanceInsights=True|False,
     #PerformanceInsightsKMSKeyId='string',
     #CACertificateIdentifier='string'
                                        
@@ -379,6 +379,7 @@ def main():
     parser.add_argument('--st','--storage-type',required=False,type=str,choices=['standard','iopt1'],help='Storage type')
     parser.add_argument('--min-dcu',required=False,type=Decimal,default=0.5,help='ServerlessV2 Minimum DCU')
     parser.add_argument('--max-dcu',required=False,type=Decimal,default=64,help='ServerlessV2 Maximum DCU')
+    parser.add_argument('--performance-insights',required=False,action="store_true",help='Enable performance insights')
 
     args = parser.parse_args()
     
@@ -403,6 +404,7 @@ def main():
     appConfig['clusterOnly'] = args.cluster_only
     appConfig['serverlessMinDcu'] = args.min_dcu
     appConfig['serverlessMaxDcu'] = args.max_dcu
+    appConfig['performanceInsights'] = args.performance_insights
 
     if (not appConfig['createCluster']) and (not appConfig['deleteCluster']) and (not appConfig['addTag']):
         print("ERROR - must pass one of --create-cluster, --delete-cluster, or --add-tag")
