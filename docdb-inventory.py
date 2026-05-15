@@ -74,13 +74,13 @@ def report_clusters(appConfig):
                   thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),w1=maxClusterNameLength,w2=maxClusterStatusLength))
         else:
             print("")
-            print("cluster = {} | IO type = {} | version = {} | instances = {:d} | status = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+            print("cluster = {} | IO = {} | ver = {} | instances = {:d} | status = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
                   thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
                   thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['fullPayload']['DBClusterArn']))
 
             for DBInstanceIdentifier in sorted(thisCluster['instanceDetails'].keys()):
                 thisInstance = thisCluster['instanceDetails'][DBInstanceIdentifier]
-                print("  instance = {} | instance type = {} | availability zone = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
+                print("  inst = {} | type = {} | az = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
                       thisInstance['fullPayload']['DBInstances'][0]['DBInstanceStatus'],thisInstance['fullPayload']['DBInstances'][0]['DBInstanceArn']))
 
         if appConfig['verbose']:
