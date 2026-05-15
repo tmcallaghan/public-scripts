@@ -54,6 +54,7 @@ def report_clusters(appConfig):
                 responseInstance = client.describe_db_instances(DBInstanceIdentifier=thisInstance['DBInstanceIdentifier'])
                 thisClusterInstanceDict = {}
                 thisClusterInstanceDict['DBInstanceClass'] = responseInstance['DBInstances'][0]['DBInstanceClass']
+                thisClusterInstanceDict['IsClusterWriter'] = thisInstance['IsClusterWriter']
                 thisClusterInstanceDict['fullPayload'] = responseInstance
                 thisClusterInstancesDict[responseInstance['DBInstances'][0]['DBInstanceIdentifier']] = thisClusterInstanceDict.copy()
                 numInstances += 1
@@ -80,7 +81,11 @@ def report_clusters(appConfig):
 
             for DBInstanceIdentifier in sorted(thisCluster['instanceDetails'].keys()):
                 thisInstance = thisCluster['instanceDetails'][DBInstanceIdentifier]
-                print("  inst = {} | type = {} | az = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
+                if thisInstance['IsClusterWriter']:
+                    instanceRole = 'writer'
+                else:
+                    instanceRole = 'reader'
+                print("  inst = {} | type = {} | role = {} | az = {} | status = {} | arn = {}".format(DBInstanceIdentifier,thisInstance['DBInstanceClass'],instanceRole,thisInstance['fullPayload']['DBInstances'][0].get('AvailabilityZone','UNKNOWN'),
                       thisInstance['fullPayload']['DBInstances'][0]['DBInstanceStatus'],thisInstance['fullPayload']['DBInstances'][0]['DBInstanceArn']))
 
         if appConfig['verbose']:
