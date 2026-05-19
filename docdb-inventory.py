@@ -71,12 +71,12 @@ def report_clusters(appConfig):
         thisCluster = clusterArr[thisDBClusterIdentifier]
         clustersFound = True
         if appConfig['compact']:
-            print("{0:<{w1}} | IO = {1} | ver = {2} | instances = {3:d} | status = {4:<{w2}} | pg = {6} | endpoint = {5}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+            print("{0:<{w1}} | IO = {1} | ver = {2} | inst = {3:d} | stat = {4:<{w2}} | pg = {6} | endpt = {5}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
                   thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
                   thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['parameterGroup'],w1=maxClusterNameLength,w2=maxClusterStatusLength))
         else:
             print("")
-            print("cluster = {} | IO = {} | ver = {} | instances = {:d} | status = {} | pg = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+            print("cluster = {} | IO = {} | ver = {} | inst = {:d} | stat = {} | pg = {} | endpt = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
                   thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],thisCluster['clusterDetails']['parameterGroup'],
                   thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['fullPayload']['DBClusterArn']))
 
