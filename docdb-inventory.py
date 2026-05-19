@@ -39,6 +39,7 @@ def report_clusters(appConfig):
         if includeThisCluster:
             thisClusterDict = {}
             thisClusterDict['ioType'] = thisCluster.get('StorageType','standard')
+            thisClusterDict['parameterGroup'] = thisCluster.get('DBClusterParameterGroup','***MISSING***')
             thisClusterDict['engineVersionFull'] = thisCluster['EngineVersion']
             thisClusterDict['engineVersionMajor'] = int(thisClusterDict['engineVersionFull'].split('.')[0])
             thisClusterDict['status'] = thisCluster['Status']
@@ -70,13 +71,13 @@ def report_clusters(appConfig):
         thisCluster = clusterArr[thisDBClusterIdentifier]
         clustersFound = True
         if appConfig['compact']:
-            print("{0:<{w1}} | IO type = {1} | version = {2} | instances = {3:d} | status = {4:<{w2}} | endpoint = {5}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+            print("{0:<{w1}} | IO = {1} | ver = {2} | instances = {3:d} | status = {4:<{w2}} | pg = {6} | endpoint = {5}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
                   thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
-                  thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),w1=maxClusterNameLength,w2=maxClusterStatusLength))
+                  thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['parameterGroup'],w1=maxClusterNameLength,w2=maxClusterStatusLength))
         else:
             print("")
-            print("cluster = {} | IO = {} | ver = {} | instances = {:d} | status = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
-                  thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],
+            print("cluster = {} | IO = {} | ver = {} | instances = {:d} | status = {} | pg = {} | endpoint = {} | arn = {}".format(thisDBClusterIdentifier,thisCluster['clusterDetails']['ioType'],
+                  thisCluster['clusterDetails']['engineVersionFull'],thisCluster['clusterDetails']['numInstances'],thisCluster['clusterDetails']['status'],thisCluster['clusterDetails']['parameterGroup'],
                   thisCluster['clusterDetails']['fullPayload'].get('Endpoint','<<missing>>'),thisCluster['clusterDetails']['fullPayload']['DBClusterArn']))
 
             for DBInstanceIdentifier in sorted(thisCluster['instanceDetails'].keys()):
