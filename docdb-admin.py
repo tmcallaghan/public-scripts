@@ -150,8 +150,8 @@ def create_cluster(appConfig, botoClient):
     originalStartTime = time.time()
 
     opStartTime = time.time()
-    if appConfig['engineVersion'] == '5.0.0':
-        # serverless is 5.0.0 only for now, will improve or remove this hack later
+    if appConfig['engineVersion'] in ['5.0.0','8.0.0']:
+        # serverless is 5.0.0+
         response = botoClient.create_db_cluster(
                                             DBClusterIdentifier=appConfig['clusterIdentifier'],
                                             DBClusterParameterGroupName=appConfig['parameterGroup'],
