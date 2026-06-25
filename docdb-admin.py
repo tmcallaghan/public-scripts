@@ -164,7 +164,7 @@ def create_cluster(appConfig, botoClient):
                                             MasterUserPassword=appConfig['userPassword'],
                                             StorageType=appConfig['storageType'],
                                             ServerlessV2ScalingConfiguration={
-                                               'MinCapacity': 0.5,  # Minimum DCUs (0.5 to 256)
+                                               'MinCapacity': 4,  # Minimum DCUs (0.5 to 256)
                                                'MaxCapacity': 256   # Maximum DCUs (1 to 256)
                                             })
 
