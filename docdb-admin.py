@@ -150,7 +150,7 @@ def create_cluster(appConfig, botoClient):
     originalStartTime = time.time()
 
     opStartTime = time.time()
-    if appConfig['engineVersion'] in ['5.0.0','5.0.1','8.0.0','8.0.1']:
+    if appConfig['engineVersion'][0] in ['5','8']:
         # serverless is 5.0.0+
         response = botoClient.create_db_cluster(
                                             DBClusterIdentifier=appConfig['clusterIdentifier'],
@@ -298,7 +298,7 @@ def delete_cluster(appConfig, botoClient):
 
 
 def add_tag(appConfig, botoClient):
-    logIt("adding tag {}".format(appConfig['clusterIdentifier']), appConfig)
+    logIt("adding tag {}:{} to cluster {}".format(appConfig['tagKey'],appConfig['tagValue'],appConfig['clusterIdentifier']), appConfig)
     originalStartTime = time.time()
 
     # get cluter information
@@ -369,7 +369,7 @@ def main():
     parser.add_argument('--ss','--sleep-seconds',required=False,default=60,type=int,help='Seconds to sleep between AWS API calls')
     parser.add_argument('--it','--instance-type',required=False,type=str,help='DocumentDB instance type')
     parser.add_argument('--nrr','--num-read-replicas',required=False,type=int,help='Number of read replicas')
-    parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0','5.0.dev','8.0.0','8.0.1','8.0.ossdb'],help='DocumentDB version')
+    parser.add_argument('--ev','--engine-version',required=False,type=str,choices=['3.6.0','4.0.0','5.0.0','5.0.1','8.0.0','8.0.1','8.0.ossdb'],help='DocumentDB version')
     parser.add_argument('--pg','--parameter-group',required=False,type=str,help='Parameter group')
     parser.add_argument('--tag-key',required=False,type=str,help='Key name for tag')
     parser.add_argument('--tag-value',required=False,type=str,help='Value for tag')
@@ -424,8 +424,6 @@ def main():
     if args.st is not None:
         appConfig['storageType'] = args.st
         
-    #print("appConfig - {}".format(json.dumps(appConfig,sort_keys=True,indent=4,default=str)))
-
     # validate the configuration
     validate_config(appConfig)
     
@@ -440,6 +438,10 @@ def main():
 
     if appConfig['createCluster']:
         create_cluster(appConfig, botoClient)
+        # all clusters and instances get a default tag
+        appConfig['tagKey'] = "max-age-in-days"
+        appConfig['tagValue'] = "30"
+        add_tag(appConfig, botoClient)
     elif appConfig['deleteCluster']:
         delete_cluster(appConfig, botoClient)
     elif appConfig['addTag']:
