@@ -1,7 +1,7 @@
 #! /bin/bash
 
+wget https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2404-9.0.2.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2404-8.3.4.tgz 
-#wget https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2404-8.0.9.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2204-7.0.20.tgz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2204-6.0.23.tgz
 # skipping 5.0 and below, libcrypto issues
@@ -17,8 +17,8 @@ wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2404-arm64
 wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2404-arm64-100.12.0.tgz
 wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2404-arm64-100.17.0.tgz
 
+tar xzvf mongodb-linux-aarch64-ubuntu2404-9.0.2.tgz
 tar xzvf mongodb-linux-aarch64-ubuntu2404-8.3.4.tgz
-#tar xzvf mongodb-linux-aarch64-ubuntu2404-8.0.9.tgz
 tar xzvf mongodb-linux-aarch64-ubuntu2204-7.0.20.tgz
 tar xzvf mongodb-linux-aarch64-ubuntu2204-6.0.23.tgz
 # skipping 5.0 and below, libcrypto issues
